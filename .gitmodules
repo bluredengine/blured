@@ -1,0 +1,6 @@
+[submodule "godot"]
+	path = godot
+	url = git@github.com:hs3366677/godot.git
+[submodule "opencode"]
+	path = opencode
+	url = https://github.com/anomalyco/opencode.git

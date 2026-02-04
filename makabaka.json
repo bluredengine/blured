@@ -1,0 +1,18 @@
+{
+  "name": "Makabaka Engine",
+  "version": "0.1.0",
+  "description": "AI-powered game creation engine built on Godot",
+
+  "godot_path": "./godot/bin/godot.windows.editor.x86_64.exe",
+  "ai_port": 4096,
+
+  "opencode": {
+    "executable": "./opencode/packages/opencode/dist/opencode-windows-x64/bin/opencode.exe",
+    "server_args": ["serve", "--port", "4096"]
+  },
+
+  "godot_project": "./godot/addons/godot_ai",
+
+  "modules_path": "./modules",
+  "templates_path": "./templates"
+}

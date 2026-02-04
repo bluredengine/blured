@@ -1,0 +1,30 @@
+{
+  "$schema": "./module_schema.json",
+  "version": "1.0.0",
+  "modules": [
+    {
+      "id": "game_manager",
+      "name": "Game Manager",
+      "description": "Core game state management singleton for handling game flow, pausing, and global state.",
+      "category": "core",
+      "version": "1.0.0",
+      "path": "core/game_manager"
+    },
+    {
+      "id": "input_handler",
+      "name": "Input Handler",
+      "description": "Centralized input management with action mapping and input buffering support.",
+      "category": "core",
+      "version": "1.0.0",
+      "path": "core/input_handler"
+    },
+    {
+      "id": "player_movement",
+      "name": "Player Movement",
+      "description": "2D platformer movement with jumping, gravity, and basic physics for CharacterBody2D.",
+      "category": "player",
+      "version": "1.0.0",
+      "path": "player/player_movement"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "module_id": "game_manager",
+  "name": "Game Manager",
+  "description": "Core game state management singleton. Handles game flow (start, pause, resume, game over), scene transitions, and global game state. Use this as the central hub for game-wide events and state.",
+  "extends": "Node",
+  "class_name": "GameManager",
+  "singleton": true,
+  "signals": {
+    "game_started": {
+      "description": "Emitted when a new game session begins"
+    },
+    "game_paused": {
+      "description": "Emitted when the game is paused"
+    },
+    "game_resumed": {
+      "description": "Emitted when the game is unpaused"
+    },
+    "game_over": {
+      "description": "Emitted when game over state is triggered",
+      "parameters": {
+        "reason": "String"
+      }
+    },
+    "scene_changed": {
+      "description": "Emitted after a scene transition completes",
+      "parameters": {
+        "scene_path": "String"
+      }
+    }
+  },
+  "properties": {
+    "is_paused": {
+      "type": "bool",
+      "default": false,
+      "description": "Current pause state of the game"
+    },
+    "current_scene": {
+      "type": "String",
+      "description": "Path to the currently loaded scene"
+    },
+    "game_data": {
+      "type": "Dictionary",
+      "default": {},
+      "description": "Global game data accessible from anywhere"
+    }
+  },
+  "methods": {
+    "start_game": {
+      "description": "Initialize and start a new game session",
+      "parameters": {},
+      "returns": "void"
+    },
+    "pause_game": {
+      "description": "Pause the game and show pause menu",
+      "parameters": {},
+      "returns": "void"
+    },
+    "resume_game": {
+      "description": "Resume the game from paused state",
+      "parameters": {},
+      "returns": "void"
+    },
+    "toggle_pause": {
+      "description": "Toggle between paused and unpaused states",
+      "parameters": {},
+      "returns": "void"
+    },
+    "trigger_game_over": {
+      "description": "Trigger game over state with optional reason",
+      "parameters": {
+        "reason": {
+          "type": "String",
+          "default": ""
+        }
+      },
+      "returns": "void"
+    },
+    "change_scene": {
+      "description": "Transition to a new scene",
+      "parameters": {
+        "scene_path": {
+          "type": "String",
+          "required": true
+        }
+      },
+      "returns": "void"
+    },
+    "set_data": {
+      "description": "Store data in the global game_data dictionary",
+      "parameters": {
+        "key": {
+          "type": "String",
+          "required": true
+        },
+        "value": {
+          "type": "Variant",
+          "required": true
+        }
+      },
+      "returns": "void"
+    },
+    "get_data": {
+      "description": "Retrieve data from the global game_data dictionary",
+      "parameters": {
+        "key": {
+          "type": "String",
+          "required": true
+        },
+        "default": {
+          "type": "Variant",
+          "default": null
+        }
+      },
+      "returns": "Variant"
+    }
+  },
+  "usage_example": "# Access from anywhere via singleton\nGameManager.start_game()\nGameManager.set_data(\"score\", 100)\nvar score = GameManager.get_data(\"score\", 0)"
+}
