@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 Makabaka Engine Contributors
+Copyright (c) 2026-present Blured Engine Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## Trademark Notice
+
+"Blured Engine", the Blured logo, and associated branding are trademarks of
+the Blured Engine project. This MIT license grants permission to use, modify,
+and distribute the source code, but does NOT grant permission to use the
+Blured Engine name, logo, or branding in ways that suggest endorsement or
+official affiliation.
+
+### You MAY:
+- State that your project is "built with Blured Engine" or "based on Blured Engine"
+- Use the name "Blured Engine" in factual, descriptive references
+
+### You MAY NOT:
+- Use "Blured" or "Blured Engine" in your product name (e.g., "Blured Studio")
+- Use the Blured logo in your product or marketing without written permission
+- Imply official endorsement or affiliation with the Blured Engine project
