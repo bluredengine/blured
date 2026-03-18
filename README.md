@@ -1,4 +1,4 @@
-# Makabaka Engine
+# Blured Engine
 
 An AI-powered game engine built on [Godot 4.x](https://godotengine.org/) and [OpenCode](https://github.com/opencode-ai/opencode). Create games using natural language — from asset generation to gameplay scripting.
 
@@ -12,7 +12,7 @@ Godot Editor (C++) <--HTTP--> OpenCode AI Server (Bun/TypeScript) <--> Cloud AI 
   AI Assistant dock         Asset pipeline
 ```
 
-**Makabaka Engine** = Modified Godot Engine + OpenCode AI Server
+**Blured Engine** = Modified Godot Engine + OpenCode AI Server
 
 - **Godot** provides the game engine, editor, and runtime
 - **OpenCode** provides AI orchestration, LLM integration, and natural language processing
@@ -27,7 +27,7 @@ Godot Editor (C++) <--HTTP--> OpenCode AI Server (Bun/TypeScript) <--> Cloud AI 
 - **Debugger Integration** — Runtime errors are automatically forwarded to the AI for diagnosis
 - **Screenshot Analysis** — Capture game screenshots for AI-powered visual QA
 
-See [docs/makabaka-engine.md](docs/makabaka-engine.md) for the full feature reference.
+See [docs/Blured-engine.md](docs/Blured-engine.md) for the full feature reference.
 
 ## Prerequisites
 
@@ -41,8 +41,8 @@ See [docs/makabaka-engine.md](docs/makabaka-engine.md) for the full feature refe
 
 ```bash
 # Clone with submodules
-git clone --recursive https://github.com/makabaka-engine/makabaka-engine.git
-cd makabaka-engine
+git clone --recursive https://github.com/Blured-engine/Blured-engine.git
+cd Blured-engine
 
 # Install OpenCode dependencies
 cd opencode
@@ -55,7 +55,7 @@ python -m SCons platform=windows target=editor d3d12=no -j8
 cd ..
 
 # Start the engine
-./start_makabaka.bat
+./start_Blured.bat
 ```
 
 ## Configuration
@@ -97,7 +97,7 @@ The service starts automatically with the engine on port `7860`. On first run, t
 
 | Environment Variable | Default | Description |
 |---------------------|---------|-------------|
-| `MAKABAKA_RMBG_PORT` | `7860` | Port for the RMBG service |
+| `Blured_RMBG_PORT` | `7860` | Port for the RMBG service |
 
 **Priority:** PhotoRoom is used when configured. Otherwise RMBG-2.0 is used. If neither is available, background removal is skipped without breaking the pipeline.
 
@@ -106,7 +106,7 @@ The service starts automatically with the engine on port `7860`. On first run, t
 ## Project Structure
 
 ```
-makabaka-engine/
+Blured-engine/
   godot/                    # Modified Godot Engine (submodule)
     modules/godot_ai/       # Native AI integration module
     editor/plugins/         # AI Assistant & Art Director docks
