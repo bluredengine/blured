@@ -1,204 +1,118 @@
-# Contributing to Makabaka Engine
+# Contributing to Blured Engine
 
-Thank you for your interest in contributing to Makabaka Engine! This document provides guidelines and instructions for contributing.
+Blured Engine is an AI-powered game engine. Contributions are designed to be authored by **AI coding agents** (Claude Code, Cursor, etc.) working alongside human developers. This guide helps both AI agents and their operators contribute effectively.
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Types of Contributions](#types-of-contributions)
-- [Development Setup](#development-setup)
-- [Pull Request Process](#pull-request-process)
-- [Style Guides](#style-guides)
+- [Architecture Overview](#architecture-overview)
+- [Development Setup](#development-setup)a
+- [Contribution Types](#contribution-types)
 - [Community](#community)
 
-## Code of Conduct
+## Architecture Overview
 
-This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold this code.
+```
+blured-engine/
+  godot/              # Godot Engine source (C++, submodule)
+  opencode/           # OpenCode AI server (TypeScript, submodule)
+  launcher/           # Blured launcher (Rust)
+  modules/            # Reusable game modules (GDScript)
+  templates/          # Game project templates
+  prompts/            # AI prompts and skills for game development
+  .claude/skills/     # Claude Code skills for engine development
+```
 
-## Getting Started
-
-1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR-USERNAME/makabaka-engine.git`
-3. Set up the development environment (see below)
-4. Create a branch for your changes: `git checkout -b feature/your-feature`
-
-## Types of Contributions
-
-### Game Templates (Easiest)
-Create new game templates that help users start projects quickly.
-
-**Good for:** Game designers, GDScript beginners
-
-See [docs/contributing/templates.md](docs/contributing/templates.md)
-
-### Game Modules (Easy-Medium)
-Create reusable game modules like player movement, inventory systems, or AI behaviors.
-
-**Good for:** GDScript developers
-
-See [docs/contributing/modules.md](docs/contributing/modules.md)
-
-### Documentation (Easy)
-Improve documentation, write tutorials, or translate to other languages.
-
-**Good for:** Writers, educators, translators
-
-### Bug Fixes (Medium)
-Fix bugs in the core engine or addon.
-
-**Good for:** Developers familiar with Godot/GDScript
-
-### Features (Discuss First)
-Add new features to the AI system or editor integration.
-
-**Good for:** Experienced developers
-
-Please open an issue to discuss major features before starting work.
+- **Godot** provides the game editor, renderer, and runtime
+- **OpenCode** provides AI orchestration, LLM integration, and the AI server
+- **GodotAI module** (`godot/modules/godot_ai/`) bridges the two -- embedding AI directly into the Godot editor
+- **AA** (AI Assistant) is the built-in AI chat panel in the Godot editor
 
 ## Development Setup
 
 ### Prerequisites
 
-- Godot 4.x
+- Python 3.x + SCons (for Godot builds)
+- Visual Studio with C++ workload (Windows)
 - Bun 1.3+ (for OpenCode)
-- Git
+- Rust toolchain (for launcher)
+- Git with submodule support
 
-### Setup Steps
+### Clone
 
 ```bash
-# Clone the repository
-git clone https://github.com/makabaka-engine/makabaka-engine.git
-cd makabaka-engine
+git clone --recurse-submodules https://github.com/bluredengine/blured.git
+cd blured
+```
 
-# Install OpenCode dependencies
-cd opencode
+### Build
+
+```bash
+# Build everything
+build_blured.bat
+
+# Or build components individually:
+
+# OpenCode only
+cd opencode/packages/opencode
 bun install
+bun run build --single
 
-# Build OpenCode
-bun run build
-cd ..
-
-# Open Godot project
+# Godot only (requires Visual Studio)
 cd godot
-# Open with Godot editor
+python -m SCons platform=windows target=editor d3d12=no -j8
+
+# Launcher only
+cd launcher
+cargo build --release
 ```
 
-### Running Tests
+### Run
 
 ```bash
-# OpenCode tests
-cd opencode
-bun test
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your project path
 
-# Godot tests (if using GUT)
-# Run from Godot editor
+# Start the engine
+start_blured.bat
 ```
 
-## Pull Request Process
+The AI server runs on `http://localhost:4096` by default.
 
-1. **Create an issue first** for significant changes
-2. **Fork and branch** from `main`
-3. **Make your changes** following the style guides
-4. **Test your changes** thoroughly
-5. **Update documentation** if needed
-6. **Submit a PR** with a clear description
+## Contribution Types
 
-### PR Checklist
+### AA Agent Tools
 
-- [ ] Code follows the style guide
-- [ ] Tests pass (if applicable)
-- [ ] Documentation updated
-- [ ] Commit messages are clear
-- [ ] PR description explains the changes
+Tools that the AI Assistant can invoke from within the Godot editor to help users build games. These extend what the AA can do -- for example, generating scenes, analyzing screenshots, spawning enemies, or managing game state.
 
-### Commit Message Format
+Tools are defined in the OpenCode server and exposed to the GodotAI module.
 
-```
-<type>: <short description>
+### AA Skills and Tasks
 
-<longer description if needed>
+Predefined workflows that the AA can execute as multi-step operations. Skills live in `prompts/skills/` and define structured prompts for complex game development tasks like:
 
-<footer>
-```
+- `create-game` -- scaffold a complete game project
+- `add-level` -- generate a new level for an existing game
+- `analyze-screenshot` -- analyze a screenshot and suggest improvements
+- `polish` -- polish and refine game feel
+- `ui-layout-replicate` -- replicate a UI design in Godot
+- `worldbuilding` -- build a game world's foundation
 
-Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+Contributors can add new skills by creating a folder in `prompts/skills/` with a `SKILL.md` file.
 
-Example:
-```
-feat: add slow tower module
+### Engine Development Skills
 
-Adds a new tower type that slows enemies in range.
-Includes interface.json and tower_slow.gd.
+Claude Code skills for engine development workflow live in `.claude/skills/`. These automate engine-level tasks like building, starting, and managing the development process.
 
-Closes #123
-```
+### Engine Features
 
-## Style Guides
-
-### GDScript Style Guide
-
-Follow the [official GDScript style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html) with these additions:
-
-```gdscript
-# Use class_name for reusable classes
-class_name MyModule
-extends Node
-
-## Documentation comment for the class
-
-# Signals first
-signal my_signal(value: int)
-
-# Then exports
-@export var my_property: int = 10
-
-# Then public variables
-var public_var: String = ""
-
-# Then private variables (prefixed with _)
-var _private_var: int = 0
-
-
-func _ready() -> void:
-    pass
-
-
-## Public method with documentation
-func public_method() -> void:
-    pass
-
-
-func _private_method() -> void:
-    pass
-```
-
-### TypeScript Style Guide (OpenCode)
-
-- Use TypeScript strict mode
-- Prefer `const` over `let`
-- Use meaningful variable names
-- Add JSDoc comments for public APIs
-
-### JSON Style Guide
-
-- 2-space indentation
-- Use `snake_case` for keys
-- Include descriptions for configuration options
+Modifications to Godot source (`godot/`) or OpenCode source (`opencode/`) that add new AI capabilities to the editor. Please open an issue to discuss engine-level changes before starting work.
 
 ## Community
 
 - **GitHub Issues**: Bug reports and feature requests
 - **GitHub Discussions**: Questions and ideas
-- **Discord**: Real-time chat (coming soon)
 
-## Recognition
+## License
 
-Contributors are recognized in:
-- CONTRIBUTORS.md file
-- Release notes
-- Project README (major contributors)
-
-## Questions?
-
-Feel free to open an issue or start a discussion if you have questions about contributing!
+By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
