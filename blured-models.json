@@ -1,0 +1,13 @@
+{
+  "image_generation": "nano-banana-2",
+  "image_transform": "sdxl",
+  "image_batch": "nano-banana-2",
+  "style_consistency": "nano-banana-2",
+  "art_explore": "nano-banana-2",
+  "style_set": "nano-banana-2",
+  "cornerstone": "nano-banana-2",
+  "model_3d": "meshy-6",
+  "image_doubao": "seedream-4",
+  "audio_sfx": "suno-sfx",
+  "audio_music": "suno-v5"
+}
