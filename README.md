@@ -29,34 +29,44 @@ Godot Editor (C++) <--HTTP--> OpenCode AI Server (Bun/TypeScript) <--> Cloud AI 
 
 See [docs/Blured-engine.md](docs/Blured-engine.md) for the full feature reference.
 
-## Prerequisites
+## Installation
 
-- **Python** 3.10+ (for SCons build and RMBG service)
-- **SCons** (Godot build system)
-- **Bun** 1.3+ (for OpenCode)
-- **Git** with submodule support
-- **Visual Studio 2022** or **MSVC Build Tools** (Windows) / GCC/Clang (Linux/macOS)
+### Prerequisites
 
-## Getting Started
+- **Windows 10/11** (64-bit)
 
+### Quick Start
+
+1. Download the latest release from [Releases](https://github.com/bluredengine/blured/releases)
+2. Extract to a folder (e.g. `C:\BluredEngine\`)
+3. Run `blured.exe`
+4. Open the **AI Assistant** panel (right side) and configure your LLM API key via the Setup Wizard
+
+The engine ships with all local AI providers (image processing, GIF recording, atlas splitting) pre-installed. No extra setup needed.
+
+### Optional: RMBG-2.0 (Local Background Removal)
+
+RMBG-2.0 is a free, local background removal service using [BRIA RMBG-2.0](https://huggingface.co/briaai/RMBG-2.0). It requires extra setup because it depends on Python and PyTorch.
+
+**Requirements:**
+- **Python 3.10+** installed and on PATH
+- ~2GB disk space (model weights downloaded on first run)
+- GPU optional but recommended (CUDA-compatible NVIDIA GPU)
+
+**Setup:**
 ```bash
-# Clone with submodules
-git clone --recursive https://github.com/Blured-engine/Blured-engine.git
-cd Blured-engine
-
-# Install OpenCode dependencies
-cd opencode
-bun install
-cd ..
-
-# Build Godot
-cd godot
-python -m SCons platform=windows target=editor d3d12=no -j8
-cd ..
-
-# Start the engine
-./start_Blured.bat
+cd services/rmbg
+pip install -r requirements.txt
+python main.py
 ```
+
+If you don't want to set up RMBG locally, you can configure an **online provider** instead (e.g. Replicate) in the Setup Wizard to get background removal capability without any local Python/ML setup.
+
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `BLURED_RMBG_PORT` | `7860` | Port for the RMBG service |
+
+> **License note:** The RMBG-2.0 model is licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). Commercial use requires a separate agreement with [BRIA](https://bria.ai/).
 
 ## Configuration
 
@@ -76,47 +86,55 @@ Configure API keys for asset generation providers in the AI Assistant Setup Wiza
 
 ### Background Removal
 
-The asset pipeline automatically removes backgrounds from generated sprites and textures. Two providers are supported:
+The asset pipeline automatically removes backgrounds from generated sprites and textures. Two methods are supported:
 
-#### Option 1: PhotoRoom API (cloud, fast)
+- **Online provider** (e.g. Replicate) -- configure in the Setup Wizard. No local setup needed.
+- **RMBG-2.0** (local, free) -- see [Optional: RMBG-2.0](#optional-rmbg-20-local-background-removal) above.
 
-Set the `PHOTOROOM_API_KEY` environment variable. Get a key from [photoroom.com](https://www.photoroom.com/api).
+If neither is available, background removal is skipped without breaking the pipeline.
 
-#### Option 2: RMBG-2.0 (local, free)
+## Building from Source
 
-A local background removal service using [BRIA RMBG-2.0](https://huggingface.co/briaai/RMBG-2.0). No API key needed.
+### Prerequisites
+
+- **Python** 3.10+ and **SCons** (Godot build system)
+- **Bun** 1.3+ (for OpenCode)
+- **Git** with submodule support
+- **Visual Studio 2022** or **MSVC Build Tools** (Windows) / GCC/Clang (Linux/macOS)
+
+### Build Steps
 
 ```bash
-# Install Python dependencies
-pip install -r opencode/packages/opencode/services/rmbg/requirements.txt
+# Clone with submodules
+git clone --recursive https://github.com/bluredengine/blured.git
+cd blured
+
+# Install OpenCode dependencies
+cd opencode
+bun install
+cd ..
+
+# Build Godot
+cd godot
+python -m SCons platform=windows target=editor d3d12=no -j8
+cd ..
+
+# Start the engine
+./start_Blured.bat
 ```
-
-The service starts automatically with the engine on port `7860`. On first run, the model (~1GB) is downloaded from HuggingFace.
-
-**GPU acceleration** is optional — install the [CUDA version of PyTorch](https://pytorch.org/get-started/locally/) for faster inference. CPU also works.
-
-| Environment Variable | Default | Description |
-|---------------------|---------|-------------|
-| `Blured_RMBG_PORT` | `7860` | Port for the RMBG service |
-
-**Priority:** PhotoRoom is used when configured. Otherwise RMBG-2.0 is used. If neither is available, background removal is skipped without breaking the pipeline.
-
-> **License note:** The RMBG-2.0 model is licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). Commercial use requires a separate agreement with [BRIA](https://bria.ai/).
 
 ## Project Structure
 
 ```
-Blured-engine/
+blured-engine/
   godot/                    # Modified Godot Engine (submodule)
-    modules/godot_ai/       # Native AI integration module
     editor/plugins/         # AI Assistant & Art Director docks
   opencode/                 # OpenCode AI Server (submodule)
     packages/opencode/
       services/rmbg/        # RMBG-2.0 background removal service
       src/server/           # HTTP server & routes
       src/tool/             # AI tools (asset pipeline, postprocess, etc.)
-  templates/                # Game templates
-  modules/                  # Reusable game modules
+  launcher/                 # Rust launcher with auto-update
   docs/                     # Documentation
 ```
 

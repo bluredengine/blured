@@ -5,7 +5,7 @@ use std::env;
 use std::fs;
 use std::io::{self, BufRead};
 use std::path::{Path, PathBuf};
-use std::process::{self, Child, Command, Stdio};
+use std::process::{self, Child, Command};
 use std::time::Duration;
 use std::thread;
 #[cfg(windows)]
@@ -34,7 +34,7 @@ fn main() {
     if args.iter().any(|a| a == "--update") {
         match updater::check_for_update(&launcher_dir) {
             Some(info) => {
-                println!("Updating RedBlue Engine {} -> {}...", info.current, info.latest);
+                println!("Updating Blured Engine {} -> {}...", info.current, info.latest);
                 match updater::apply_update(&launcher_dir, &info) {
                     Ok(()) => {
                         println!("Update complete! Restart the launcher to use the new version.");
@@ -67,11 +67,11 @@ fn launch_engine(launcher_dir: PathBuf, env_vars: HashMap<String, String>, args:
     }
 
     let ai_port = env_vars
-        .get("MAKABAKA_AI_PORT")
+        .get("BLURED_AI_PORT")
         .and_then(|v| v.parse::<u16>().ok())
-        .unwrap_or(4096);
+        .unwrap_or(13700);
 
-    let project_path = env_vars.get("MAKABAKA_PROJECT_PATH").cloned();
+    let project_path = env_vars.get("BLURED_PROJECT_PATH").cloned();
 
     // Check for updates in background
     let launcher_dir_clone = launcher_dir.clone();
@@ -102,21 +102,26 @@ fn launch_engine(launcher_dir: PathBuf, env_vars: HashMap<String, String>, args:
             }
 
             #[cfg(windows)]
-            cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+            cmd.creation_flags(0x08000000 | 0x00000200); // CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP
             match cmd.spawn()
             {
                 Ok(child) => {
                     ai_server = Some(child);
                     wait_for_server(ai_port, Duration::from_secs(30));
                 }
-                Err(_) => {}
+                Err(e) => {
+                    eprintln!("Failed to start OpenCode: {}", e);
+                    if let Some(ref f) = log_file {
+                        use std::io::Write;
+                        let _ = writeln!(f.try_clone().unwrap(), "Failed to start OpenCode: {}", e);
+                    }
+                }
             }
         }
     }
 
     // Launch Godot editor
-    let godot_exe = find_executable(&launcher_dir, "redblue")
-        .or_else(|| find_executable(&launcher_dir, "makabaka"));
+    let godot_exe = find_executable(&launcher_dir, "blured");
 
     if let Some(exe) = &godot_exe {
         let mut cmd = Command::new(exe);
@@ -136,8 +141,8 @@ fn launch_engine(launcher_dir: PathBuf, env_vars: HashMap<String, String>, args:
     }
 
     // Let the AI server continue running independently.
-    // It will be reused if the editor is relaunched, and cleaned up on next launch
-    // if the port is already occupied.
+    // It will be killed on next launch if the port is already occupied.
+    // On Windows, dropping the Child handle does NOT kill the process.
     drop(ai_server);
 }
 
@@ -199,7 +204,7 @@ fn find_executable(base_dir: &Path, name: &str) -> Option<PathBuf> {
     }
 
     // Fallback: try Godot's default name
-    if name == "makabaka" || name == "redblue" {
+    if name == "blured" {
         let godot_name = "godot.windows.editor.x86_64.exe";
         let fallbacks = [
             base_dir.join("bin").join(godot_name),
