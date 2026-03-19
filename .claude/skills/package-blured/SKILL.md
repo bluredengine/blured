@@ -1,0 +1,44 @@
+---
+name: package-blured
+description: Package the Blured Engine into a distributable directory
+---
+
+# Package Blured Engine
+
+This skill packages the built Blured Engine into a distributable directory at `dist/blured-engine/`.
+
+## Instructions
+
+When the user asks to "package blured", "package the engine", "create a dist", or similar, run:
+
+```bash
+bash g:/blured-engine/.claude/skills/package-blured/scripts/package_blured.sh
+```
+
+## Prerequisites
+
+Both OpenCode and Godot must be built first. If not, tell the user to run `/build-blured`.
+
+## Output
+
+The packaged engine is created at `dist/blured-engine/` with this structure:
+
+```
+dist/blured-engine/
+  blured.exe            (launcher with auto-update)
+  bin/
+    blured.exe          (Godot editor)
+    opencode.exe        (AI server)
+  node_modules/         (local provider packages: sharp, gifenc, opencv-js)
+  docs/
+  blured.json
+  blured-models.json
+  VERSION
+  LICENSE
+```
+
+## Notes
+
+- Local provider npm packages (sharp, gifenc, @techstark/opencv-js) are installed during packaging via `bun add`
+- The `node_modules/` directory is preserved across re-packaging (not wiped during clean)
+- The launcher is built from Rust source in `launcher/`

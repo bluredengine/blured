@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill //F //IM godot.windows.editor.x86_64.exe)",
+      "Bash(taskkill //F //IM opencode.exe)",
+      "Bash(taskkill //F //IM bun.exe)",
+      "Bash(bash script/clean-dist.sh)",
+      "Bash(bun run:*)",
+      "Bash(python -m SCons platform=windows target=editor d3d12=no -j8)"
+    ]
+  }
+}

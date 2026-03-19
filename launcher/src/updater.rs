@@ -4,10 +4,10 @@ use std::path::{Path, PathBuf};
 use serde::Deserialize;
 
 /// GitHub repo for update checks (owner/repo)
-const GITHUB_REPO: &str = "hs3366677/makabaka-engine";
+const GITHUB_REPO: &str = "bluredengine/blured";
 
 /// Asset name pattern in GitHub releases (the zip containing the full engine)
-const ASSET_NAME_PATTERN: &str = "redblue-engine-windows";
+const ASSET_NAME_PATTERN: &str = "blured-engine-windows";
 
 /// Local version file name
 const VERSION_FILE: &str = "VERSION";
@@ -56,7 +56,7 @@ pub fn check_for_update(base_dir: &Path) -> Option<UpdateInfo> {
     );
 
     let client = reqwest::blocking::Client::builder()
-        .user_agent("redblue-launcher")
+        .user_agent("blured-launcher")
         .timeout(std::time::Duration::from_secs(10))
         .build()
         .ok()?;
@@ -133,7 +133,7 @@ pub fn apply_update(base_dir: &Path, info: &UpdateInfo) -> Result<(), Box<dyn st
 /// Download a file with progress indication
 fn download_file(url: &str, dest: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::blocking::Client::builder()
-        .user_agent("redblue-launcher")
+        .user_agent("blured-launcher")
         .timeout(std::time::Duration::from_secs(600))
         .build()?;
 

@@ -1,8 +1,8 @@
 [package]
-name = "makabaka-launcher"
+name = "blured-launcher"
 version = "0.1.0"
 edition = "2021"
-description = "RedBlue Engine launcher with auto-update"
+description = "Blured Engine launcher with auto-update"
 
 [dependencies]
 reqwest = { version = "0.12", features = ["blocking", "json"] }
