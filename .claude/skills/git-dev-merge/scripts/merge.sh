@@ -27,7 +27,7 @@ if [ -z "$FEATURE_BRANCH" ]; then
     # Auto-detect from current branch
     cd "$ROOT"
     FEATURE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-    if [ "$FEATURE_BRANCH" = "master" ] || [ "$FEATURE_BRANCH" = "blured" ]; then
+    if [ "$FEATURE_BRANCH" = "main" ]; then
         error "Cannot merge: already on base branch '$FEATURE_BRANCH'. Provide a feature branch name."
         exit 1
     fi
@@ -98,15 +98,15 @@ merge_submodule() {
 }
 
 # === 1. Merge submodules first ===
-merge_submodule "$ROOT/godot" "godot" "blured"
-merge_submodule "$ROOT/opencode" "opencode" "blured"
+merge_submodule "$ROOT/godot" "godot" "main"
+merge_submodule "$ROOT/opencode" "opencode" "main"
 
 # === 2. Update main repo submodule refs ===
 cd "$ROOT"
 
 # Checkout submodules to their base branches so refs point to merged state
-cd "$ROOT/godot" && git checkout blured && git pull origin blured 2>/dev/null
-cd "$ROOT/opencode" && git checkout blured && git pull origin blured 2>/dev/null
+cd "$ROOT/godot" && git checkout main && git pull origin main 2>/dev/null
+cd "$ROOT/opencode" && git checkout main && git pull origin main 2>/dev/null
 cd "$ROOT"
 
 # Stage submodule ref updates if they changed
@@ -118,19 +118,19 @@ if ! git diff --quiet godot opencode 2>/dev/null; then
 fi
 
 # === 3. Merge main repo ===
-header "blured-engine ($FEATURE_BRANCH → master)"
+header "blured-engine ($FEATURE_BRANCH → main)"
 
 git fetch origin
 
-MERGE_MSG="Merge $FEATURE_BRANCH into master"
+MERGE_MSG="Merge $FEATURE_BRANCH into main"
 if [ -n "$ISSUE_NUMBER" ]; then
     MERGE_MSG="$MERGE_MSG
 
 Closes #$ISSUE_NUMBER"
 fi
 
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 
 if ! git merge --no-ff "$FEATURE_BRANCH" -m "$MERGE_MSG"; then
     error "blured-engine: MERGE CONFLICT — resolve manually and re-run"
@@ -145,7 +145,7 @@ git branch -d "$FEATURE_BRANCH"
 git push origin --delete "$FEATURE_BRANCH" 2>/dev/null || true
 info "Deleted branch '$FEATURE_BRANCH' from blured-engine"
 
-MERGED_REPOS+=("blured-engine: $FEATURE_BRANCH → master")
+MERGED_REPOS+=("blured-engine: $FEATURE_BRANCH → main")
 
 # === 4. Close issue if provided ===
 if [ -n "$ISSUE_NUMBER" ]; then

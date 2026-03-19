@@ -19,9 +19,9 @@ Example:
 
 ## Repository Layout
 
-- **Main repo** (`g:/blured-engine`): `origin` → `github.com:bluredengine/blured.git`, base branch `master`
-- **godot/** submodule: `origin` → `github.com:bluredengine/godot.git`, base branch `blured`
-- **opencode/** submodule: `origin` → `github.com:bluredengine/opencode.git`, base branch `blured`
+- **Main repo** (`g:/blured-engine`): `origin` → `github.com:bluredengine/blured.git`, base branch `main`
+- **godot/** submodule: `origin` → `github.com:bluredengine/godot.git`, base branch `main`
+- **opencode/** submodule: `origin` → `github.com:bluredengine/opencode.git`, base branch `main`
 
 ## Workflow
 
@@ -106,35 +106,35 @@ Use the **main repo issue number** in the branch name across all three repos. Cr
 
 Branch naming: `feature/<main-issue-number>-<short-slug>` (e.g. `feature/58-add-dark-mode-toggle`)
 
-#### 2a. Main repo (from `master`)
+#### 2a. Main repo (from `main`)
 
 ```bash
 cd "g:/blured-engine"
 git fetch origin
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 git checkout -b feature/<main-issue-number>-<slug>
 git push -u origin feature/<main-issue-number>-<slug>
 ```
 
-#### 2b. godot submodule (from `blured`)
+#### 2b. godot submodule (from `main`)
 
 ```bash
 cd "g:/blured-engine/godot"
 git fetch origin
-git checkout blured
-git pull origin blured
+git checkout main
+git pull origin main
 git checkout -b feature/<main-issue-number>-<slug>
 git push -u origin feature/<main-issue-number>-<slug> --no-verify
 ```
 
-#### 2c. opencode submodule (from `blured`)
+#### 2c. opencode submodule (from `main`)
 
 ```bash
 cd "g:/blured-engine/opencode"
 git fetch origin
-git checkout blured
-git pull origin blured
+git checkout main
+git pull origin main
 git checkout -b feature/<main-issue-number>-<slug>
 git push -u origin feature/<main-issue-number>-<slug> --no-verify
 ```
@@ -154,9 +154,9 @@ Overwrite the current workspace status to CLAUDE.local.md:
 ### Repos
 | Repo | Base Branch | Feature Branch | Issue |
 |------|-------------|----------------|-------|
-| blured-engine | master | feature/<main-issue-number>-<slug> | #<main-issue-number> |
-| godot | blured | feature/<main-issue-number>-<slug> | bluredengine/godot#<godot-issue-number> |
-| opencode | blured | feature/<main-issue-number>-<slug> | bluredengine/opencode#<opencode-issue-number> |
+| blured-engine | main | feature/<main-issue-number>-<slug> | #<main-issue-number> |
+| godot | main | feature/<main-issue-number>-<slug> | bluredengine/godot#<godot-issue-number> |
+| opencode | main | feature/<main-issue-number>-<slug> | bluredengine/opencode#<opencode-issue-number> |
 
 ---
 
@@ -175,9 +175,9 @@ Created issues:
 
 Branch: feature/<main-issue-number>-<slug> (created in all 3 repos)
 
-  blured-engine: master  → feature/<main-issue-number>-<slug>
-  godot:           blured → feature/<main-issue-number>-<slug>
-  opencode:        blured → feature/<main-issue-number>-<slug>
+  blured-engine: main   → feature/<main-issue-number>-<slug>
+  godot:           main   → feature/<main-issue-number>-<slug>
+  opencode:        main   → feature/<main-issue-number>-<slug>
 
 Workspace logged in CLAUDE.local.md
 
