@@ -9,9 +9,9 @@ Merge feature branches back to their base branches across the main repo and subm
 
 ## Repository Layout
 
-- **Main repo**: `origin` → `github.com:bluredengine/blured.git`, base branch `master`
-- **godot/** submodule: `origin` → `github.com:bluredengine/godot.git`, base branch `blured`
-- **opencode/** submodule: `origin` → `github.com:bluredengine/opencode.git`, base branch `blured`
+- **Main repo**: `origin` → `github.com:bluredengine/blured.git`, base branch `main`
+- **godot/** submodule: `origin` → `github.com:bluredengine/godot.git`, base branch `main`
+- **opencode/** submodule: `origin` → `github.com:bluredengine/opencode.git`, base branch `main`
 
 The script auto-detects the workspace root from its own location.
 
@@ -40,10 +40,10 @@ bash "<workspace>/.claude/skills/git-dev-merge/scripts/merge.sh" "feature/7-ai-m
 ## What the Script Does
 
 1. **Pushes pending changes first** — use `/git-pushing` before running this if there are uncommitted changes
-2. **Merges godot/** submodule: `feature/<branch>` → `blured`, deletes feature branch
-3. **Merges opencode/** submodule: `feature/<branch>` → `blured`, deletes feature branch
+2. **Merges godot/** submodule: `feature/<branch>` → `main`, deletes feature branch
+3. **Merges opencode/** submodule: `feature/<branch>` → `main`, deletes feature branch
 4. **Updates submodule refs** in the main repo
-5. **Merges main repo**: `feature/<branch>` → `master`, deletes feature branch
+5. **Merges main repo**: `feature/<branch>` → `main`, deletes feature branch
 6. **Closes the GitHub issue** (if issue number provided)
 7. **Shows merge summary**
 
