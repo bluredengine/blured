@@ -1,6 +1,8 @@
 [submodule "godot"]
 	path = godot
 	url = https://github.com/bluredengine/godot.git
+	branch = main
 [submodule "opencode"]
 	path = opencode
 	url = https://github.com/bluredengine/opencode.git
+	branch = main
