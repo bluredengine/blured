@@ -16,15 +16,16 @@ echo "Workspace: $WORKSPACE"
 echo "Output:    $DIST"
 echo ""
 
-# Clean previous package (preserve node_modules)
+# Clean previous package
 if [ -d "$DIST" ]; then
     echo "Cleaning previous package..."
-    find "$DIST" -mindepth 1 -maxdepth 1 ! -name 'node_modules' -exec rm -rf {} +
+    find "$DIST" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 fi
 
 # Create directory structure
 mkdir -p "$DIST/bin"
 mkdir -p "$DIST/docs"
+mkdir -p "$DIST/tools"
 
 # 1. Copy Godot editor
 echo "[1/7] Copying Godot editor..."
@@ -78,18 +79,15 @@ echo "[5/7] Copying configuration..."
 [ -f "$WORKSPACE/.env.example" ] && cp "$WORKSPACE/.env.example" "$DIST/.env.example"
 [ -f "$WORKSPACE/LICENSE" ] && cp "$WORKSPACE/LICENSE" "$DIST/"
 
-# 6. Install local provider npm packages (sharp, gifenc, opencv-js)
-echo "[6/7] Installing local provider packages..."
-cat > "$DIST/package.json" << 'PKGJSON'
-{
-  "name": "blured-engine",
-  "version": "0.1.0",
-  "private": true
-}
-PKGJSON
-pushd "$DIST" > /dev/null
-bun add sharp gifenc @techstark/opencv-js 2>&1
-popd > /dev/null
+# 6. Copy tools (ScreenCapture.exe for snipping)
+echo "[6/7] Copying tools..."
+TOOLS_DIR="$WORKSPACE/godot/bin/tools"
+if [ -d "$TOOLS_DIR" ]; then
+    cp -r "$TOOLS_DIR/"* "$DIST/tools/" 2>/dev/null || true
+    echo "  Copied tools from $TOOLS_DIR"
+else
+    echo "  WARNING: No tools directory found at $TOOLS_DIR"
+fi
 
 # 7. Write version file
 echo "[7/7] Writing version..."
@@ -105,7 +103,7 @@ echo "Contents:"
 echo "  $DIST/blured.exe            (launcher)"
 echo "  $DIST/bin/blured.exe        (godot editor)"
 echo "  $DIST/bin/opencode.exe      (AI server)"
-echo "  $DIST/node_modules/         (local providers: sharp, gifenc, opencv-js)"
+echo "  $DIST/tools/                (ScreenCapture.exe for snipping)"
 echo ""
 echo "Launch with: blured.exe"
 echo "  or: blured.exe --project-manager"

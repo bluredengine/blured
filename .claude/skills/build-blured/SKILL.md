@@ -27,10 +27,8 @@ Note: OpenCode's process may appear as `bun.exe` instead of `opencode.exe`.
 
 ### Step 1: Build OpenCode
 
-**Important:** Do NOT `rm -rf dist`. The `dist/opencode-windows-x64/node_modules/` directory contains locally installed provider packages (sharp, gifenc, etc.) that must be preserved across rebuilds.
-
 ```bash
-cd /g/blured-engine/opencode/packages/opencode && bash script/clean-dist.sh && bun run build --single
+cd /g/blured-engine/opencode/packages/opencode && bun run build --single
 ```
 
 This creates the executable at: `opencode/packages/opencode/dist/opencode-windows-x64/bin/opencode.exe`
@@ -63,7 +61,7 @@ If the user says "build opencode only" or "rebuild opencode":
 ```bash
 taskkill //F //IM opencode.exe 2>&1 || echo "OpenCode not running"
 taskkill //F //IM bun.exe 2>&1 || echo "Bun not running"
-cd /g/blured-engine/opencode/packages/opencode && bash script/clean-dist.sh && bun run build --single
+cd /g/blured-engine/opencode/packages/opencode && bun run build --single
 ```
 
 ### Build Only Godot
