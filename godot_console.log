@@ -1,0 +1,25 @@
+Blured v4.6.1.stable.custom_build.69e96c054 (2026-03-19 10:24:36 UTC) - https://github.com/bluredengine
+OpenGL API 3.3.0 Core Profile Context 25.9.1.250822 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 7900 XTX
+
+ERROR: Cannot connect to 'toggled': the provided callable is not valid: 'AIAssistantDock::_on_thinking_toggled'.
+   at: Object::connect (core\object\object.cpp:1617)
+ERROR: Cannot connect to 'toggled': the provided callable is not valid: 'AIAssistantDock::_on_autotest_toggled'.
+   at: Object::connect (core\object\object.cpp:1617)
+ERROR: In Object of type 'AIPromptEditorDialog': Attempt to connect nonexistent signal 'confirmed' to callable 'AIPromptEditorDialog::_on_confirmed'.
+   at: Object::connect (core\object\object.cpp:1638)
+[AIAssistant] Health check â http://localhost:13700/global/health
+[AIAssistant] HTTP completed: request_type=1 result=0 code=200 body_size=77
+[AIAssistant] CLEAR_SITE_D: found existing session from session list
+[AIAssistant] _clear_chat_ui() called. session_id=ses_2f92 connection_status=2 children=1
+[AIAssistant] HTTP completed: request_type=6 result=0 code=200 body_size=3373
+AIAssistant: Loaded saved model from config: anthropic/claude-opus-4-6
+[AIAssistant] Fetching providers: GET http://localhost:13700/provider
+[AIAssistant] Provider HTTP response (type=1): code=200 body_size=23816
+[AIAssistant] Parsed 2 providers, 3 connected
+[AIAssistant] Fetching auth methods: GET http://localhost:13700/provider/auth
+[AIAssistant] Provider HTTP response (type=2): code=200 body_size=495
+[AIAssistant] Loaded auth methods for 4 providers
+[AIAssistant] Loaded engine prompt: game-development-rule.md
+[AIAssistant] Loaded engine prompt: godot-editor-tools-guide.md
+[AIAssistant] Loaded 2 engine prompt files from G:/blured-engine/prompts
+[AIAssistant] HTTP completed: request_type=7 result=0 code=204 body_size=0
