@@ -29,7 +29,8 @@ dist/blured-engine/
   bin/
     blured.exe          (Godot editor)
     opencode.exe        (AI server)
-  node_modules/         (local provider packages: sharp, gifenc, opencv-js)
+  tools/
+    ScreenCapture.exe   (snipping tool)
   docs/
   blured.json
   blured-models.json
@@ -39,6 +40,6 @@ dist/blured-engine/
 
 ## Notes
 
-- Local provider npm packages (sharp, gifenc, @techstark/opencv-js) are installed during packaging via `bun add`
-- The `node_modules/` directory is preserved across re-packaging (not wiped during clean)
+- Image processing (sharp, gifenc, opencv-js) is now handled natively by Godot's Image class -- no node_modules needed
+- The `tools/` directory contains ScreenCapture.exe for the snipping feature
 - The launcher is built from Rust source in `launcher/`

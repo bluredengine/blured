@@ -16,18 +16,19 @@ echo "Workspace: $WORKSPACE"
 echo "Output:    $DIST"
 echo ""
 
-# Clean previous package (preserve node_modules)
+# Clean previous package
 if [ -d "$DIST" ]; then
     echo "Cleaning previous package..."
-    find "$DIST" -mindepth 1 -maxdepth 1 ! -name 'node_modules' -exec rm -rf {} +
+    find "$DIST" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 fi
 
 # Create directory structure
 mkdir -p "$DIST/bin"
 mkdir -p "$DIST/docs"
+mkdir -p "$DIST/tools"
 
 # 1. Copy Godot editor
-echo "[1/7] Copying Godot editor..."
+echo "[1/8] Copying Godot editor..."
 GODOT_EXE="$WORKSPACE/godot/bin/godot.windows.editor.x86_64.exe"
 if [ ! -f "$GODOT_EXE" ]; then
     echo "ERROR: Godot editor not found at $GODOT_EXE"
@@ -37,7 +38,7 @@ fi
 cp "$GODOT_EXE" "$DIST/bin/blured.exe"
 
 # 2. Copy OpenCode server
-echo "[2/7] Copying OpenCode server..."
+echo "[2/8] Copying OpenCode server..."
 OPENCODE_EXE="$WORKSPACE/opencode/packages/opencode/dist/opencode-windows-x64/bin/opencode.exe"
 if [ ! -f "$OPENCODE_EXE" ]; then
     echo "ERROR: OpenCode exe not found at $OPENCODE_EXE"
@@ -47,7 +48,7 @@ fi
 cp "$OPENCODE_EXE" "$DIST/bin/opencode.exe"
 
 # 3. Build and copy launcher
-echo "[3/7] Building launcher..."
+echo "[3/8] Building launcher..."
 pushd "$WORKSPACE/launcher" > /dev/null
 if [ -f "Cargo.toml" ]; then
     cargo build --release
@@ -68,31 +69,37 @@ else
 fi
 
 # 4. Copy docs
-echo "[4/7] Copying docs..."
+echo "[4/8] Copying docs..."
 [ -d "$WORKSPACE/docs" ] && cp -r "$WORKSPACE/docs/"* "$DIST/docs/" 2>/dev/null || true
 
 # 5. Copy config files
-echo "[5/7] Copying configuration..."
+echo "[5/8] Copying configuration..."
 [ -f "$WORKSPACE/blured.json" ] && cp "$WORKSPACE/blured.json" "$DIST/"
 [ -f "$WORKSPACE/blured-models.json" ] && cp "$WORKSPACE/blured-models.json" "$DIST/"
 [ -f "$WORKSPACE/.env.example" ] && cp "$WORKSPACE/.env.example" "$DIST/.env.example"
 [ -f "$WORKSPACE/LICENSE" ] && cp "$WORKSPACE/LICENSE" "$DIST/"
 
-# 6. Install local provider npm packages (sharp, gifenc, opencv-js)
-echo "[6/7] Installing local provider packages..."
-cat > "$DIST/package.json" << 'PKGJSON'
-{
-  "name": "blured-engine",
-  "version": "0.1.0",
-  "private": true
-}
-PKGJSON
-pushd "$DIST" > /dev/null
-bun add sharp gifenc @techstark/opencv-js 2>&1
-popd > /dev/null
+# 6. Copy prompts
+echo "[6/8] Copying prompts..."
+if [ -d "$WORKSPACE/prompts" ]; then
+    cp -r "$WORKSPACE/prompts" "$DIST/prompts"
+    echo "  Copied prompts/"
+else
+    echo "  WARNING: No prompts directory found"
+fi
 
-# 7. Write version file
-echo "[7/7] Writing version..."
+# 7. Copy tools (ScreenCapture.exe for snipping)
+echo "[7/8] Copying tools..."
+TOOLS_DIR="$WORKSPACE/godot/bin/tools"
+if [ -d "$TOOLS_DIR" ]; then
+    cp -r "$TOOLS_DIR/"* "$DIST/tools/" 2>/dev/null || true
+    echo "  Copied tools from $TOOLS_DIR"
+else
+    echo "  WARNING: No tools directory found at $TOOLS_DIR"
+fi
+
+# 8. Write version file
+echo "[8/8] Writing version..."
 echo "0.1.0" > "$DIST/VERSION"
 
 # Summary
@@ -105,7 +112,8 @@ echo "Contents:"
 echo "  $DIST/blured.exe            (launcher)"
 echo "  $DIST/bin/blured.exe        (godot editor)"
 echo "  $DIST/bin/opencode.exe      (AI server)"
-echo "  $DIST/node_modules/         (local providers: sharp, gifenc, opencv-js)"
+echo "  $DIST/prompts/              (AI prompts and skills)"
+echo "  $DIST/tools/                (ScreenCapture.exe for snipping)"
 echo ""
 echo "Launch with: blured.exe"
 echo "  or: blured.exe --project-manager"
