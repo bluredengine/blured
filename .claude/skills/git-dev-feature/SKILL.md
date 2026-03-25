@@ -33,7 +33,7 @@ Create a new issue on **each repo** (main repo + submodules). Each repo gets its
 
 ```bash
 cd "g:/blured-engine"
-gh issue create --title "<description>" --body "## Description
+gh issue create --repo bluredengine/blured --title "<description>" --body "## Description
 
 <description>
 
@@ -56,7 +56,7 @@ git-dev-feature skill
 
 ```bash
 cd "g:/blured-engine/godot"
-gh issue create --title "<description>" --body "## Description
+gh issue create --repo bluredengine/godot --title "<description>" --body "## Description
 
 <description>
 
@@ -79,7 +79,7 @@ git-dev-feature skill
 
 ```bash
 cd "g:/blured-engine/opencode"
-gh issue create --title "<description>" --body "## Description
+gh issue create --repo bluredengine/opencode --title "<description>" --body "## Description
 
 <description>
 

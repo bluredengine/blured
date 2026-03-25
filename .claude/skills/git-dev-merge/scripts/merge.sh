@@ -150,7 +150,7 @@ MERGED_REPOS+=("blured-engine: $FEATURE_BRANCH → main")
 # === 4. Close issue if provided ===
 if [ -n "$ISSUE_NUMBER" ]; then
     header "Issue #$ISSUE_NUMBER"
-    gh issue close "$ISSUE_NUMBER" --comment "Closed via merge of $FEATURE_BRANCH" 2>/dev/null || warn "Could not close issue #$ISSUE_NUMBER"
+    gh issue close "$ISSUE_NUMBER" --repo bluredengine/blured --comment "Closed via merge of $FEATURE_BRANCH" 2>/dev/null || warn "Could not close issue #$ISSUE_NUMBER"
     info "Issue #$ISSUE_NUMBER closed"
 fi
 
