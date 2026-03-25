@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Blured",
+      "type": "shell",
+      "command": "bash",
+      "args": [".vscode/scripts/build.sh"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "Start Blured",
+      "type": "shell",
+      "command": "bash",
+      "args": [".vscode/scripts/start.sh"],
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "Start Blured (Project Manager)",
+      "type": "shell",
+      "command": "bash",
+      "args": [".vscode/scripts/start.sh", "-new"],
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    }
+  ]
+}

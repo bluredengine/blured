@@ -56,8 +56,7 @@ Replicate a cornerstone UI reference image into a pixel-perfect Godot `.tscn` sc
    - Final summary table of ALL nodes for the .tscn file
    - The reference image as an attachment for your verification
 
-4. Review the measurement output:
-   - Check that the identified sections match what you see in the reference image
+4. **Trust the measurement output — do NOT re-examine the image yourself.** The vision model has already done pixel-precise analysis. Just:
    - Verify the space budget adds up (difference should be 0)
    - Use the **Final Summary Table** directly when writing the .tscn in Step 3
 
@@ -102,10 +101,22 @@ Every StyleBoxFlat must have ALL properties scaled:
 
 **Special:** Circular elements need `corner_radius >= size / 2`.
 
+### Font Selection (MANDATORY — never use default Godot font)
+Before writing the .tscn, you MUST find and download fonts that match the reference image:
+1. Check `res://assets/fonts/` for existing project fonts
+2. If no matching fonts exist:
+   - Study the typography in the measurement output (serif vs sans-serif, weight, pixel/retro style, decorative features)
+   - Search for matching free fonts on Google Fonts using `web_search` (e.g. "free pixel font google fonts", "free serif display font")
+   - Try multiple search queries — match the visual character: weight (bold/light), style (geometric, handwritten, pixel, slab-serif), and mood (playful, elegant, gritty)
+   - Download `.ttf`/`.otf` files to `res://assets/fonts/` using `web_fetch`
+3. You may need MULTIPLE fonts — one for headings/titles and one for body text is common
+4. Reference fonts via `[ext_resource type="FontFile" path="res://assets/fonts/..."]`
+5. Apply via `theme_override_fonts/font` on Label/Button nodes — the default Godot font is NEVER acceptable
+
 ### Node Rules
 - ALL nodes defined STATICALLY in the .tscn — no scripts, no `_ready()`, no runtime creation
-- Text: `Label` nodes with placeholder text
-- Buttons: `Button` nodes with text (no scripts)
+- Text: `Label` nodes with placeholder text and project font applied
+- Buttons: `Button` nodes with text and project font applied (no scripts)
 - Do NOT attach any `.gd` scripts
 
 ### Texture Placeholders — Use Real Files, Not ColorRect

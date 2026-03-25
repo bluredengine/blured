@@ -72,42 +72,12 @@ CRITICAL RULES:
 
 **Prerequisites:** Step 2 layout image approved.
 
-### UI Layout Replication (MUST READ)
-When replicating a UI reference image into a `.tscn` layout scene, **always refer to skill ui-layout-replicate**
+**Follow skill `ui-layout-replicate`** for the complete replication workflow (measuring, font selection, placeholder textures, writing the .tscn, and verification).
 
-Key rules (non-negotiable):
-1. **Fixed pixel values only** — use `custom_minimum_size`, never `stretch_ratio` or `size_flags_vertical = 3` for section heights
-2. **Measure, don't guess** — every value must be calculated: `2k_value = round(reference_value × scale_factor)`
-3. **Scale factor** = `viewport_height / reference_height` (currently **1.875×** for 1440/768)
-4. **Deduct consumed space** — always subtract margin, border, padding, gaps before distributing heights
-5. **Scale everything** — StyleBox (content_margin, border_width, corner_radius, shadow_size), font_size, separation, icon sizes
-6. **Verify sum** — all section heights must add up to the exact available content space
-
-**Measurement:** Call `godot_ui_measure` tool with the Step 2 layout image to get precise, LLM-analyzed measurements before writing the .tscn. Do NOT manually estimate pixel values.
-
-**CRITICAL RULES:**
+Additional rules for this step:
 - Create a BRAND NEW .tscn file — do NOT modify any existing game scenes or scripts
 - Do NOT touch the game's runtime UI code, dynamic generation code, or any existing .gd scripts
-- ALL nodes must be defined STATICALLY in the .tscn file — no scripts, no `_ready()`, no runtime node creation
-- The user must be able to see the COMPLETE layout by simply opening the .tscn in the Godot editor
-- Do NOT attach any .gd scripts to ANY node in this scene
-- Elements needing textures use placeholder PNGs (via `godot_asset_create_placeholder`), NOT `ColorRect`
-- Solid-color panel backgrounds use `StyleBoxFlat` — no placeholder textures needed for these
-
-**Actions:**
-1. Plan the node hierarchy based on the layout image:
-   - Root: `Control` (full rect anchors)
-   - Layout containers: `VBoxContainer`, `HBoxContainer`, `MarginContainer`
-   - Texture elements (icons, decorative images, avatar frames): `TextureRect` referencing placeholder PNGs
-   - Text: `Label` nodes with placeholder text
-   - Buttons: `Button` nodes with text (no scripts attached)
-   - Use `anchors_preset` and `size_flags` for responsive layout
-   - Every UI element must be a static node in the scene tree — nothing created dynamically
-2. Create placeholder textures via `godot_asset_create_placeholder` for each texture element (see `ui-layout-replicate` skill for details)
-3. Write the NEW `.tscn` file to `res://scenes/ui/[screen_name]_layout.tscn`
-4. Call `godot_editor_command` with action `scan_filesystem`
-5. Ask user to open the scene in editor
-6. Take `godot_screenshot` and compare visually with the layout image
+- Write the scene to `res://scenes/ui/[screen_name]_layout.tscn`
 
 **Ask user via `question` tool:**
 - header: "Layout Scene Created"

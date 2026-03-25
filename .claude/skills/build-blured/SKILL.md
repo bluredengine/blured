@@ -13,19 +13,37 @@ This skill builds the complete Blured Engine:
 
 When the user asks to "build blured", "rebuild blured", "compile blured", or similar, follow these steps:
 
-### Step 0: Kill running processes (Required)
+### Step 0: Detect what changed and kill relevant processes
 
-The Godot build will fail if the editor is running, and OpenCode must be stopped before rebuilding. Always kill all first:
+Check which submodules have uncommitted changes to decide what needs building:
 
 ```bash
-taskkill //F //IM godot.windows.editor.x86_64.exe 2>&1 || echo "Godot not running"
+# Check for opencode changes
+cd /g/blured-engine/opencode && git diff --stat HEAD 2>/dev/null | tail -1
+# Check for godot changes
+cd /g/blured-engine/godot && git diff --stat HEAD 2>/dev/null | tail -1
+```
+
+- If **only opencode** has changes → build OpenCode only (skip Godot)
+- If **only godot** has changes → build Godot only (skip OpenCode)
+- If **both** have changes → build both
+- If **neither** has changes → build both (assume user wants a fresh build)
+
+Kill only the processes relevant to what you're building:
+- Building OpenCode: kill `opencode.exe` and `bun.exe`
+- Building Godot: kill `godot.windows.editor.x86_64.exe`
+
+```bash
+# Kill OpenCode (if building OpenCode)
 taskkill //F //IM opencode.exe 2>&1 || echo "OpenCode not running"
 taskkill //F //IM bun.exe 2>&1 || echo "Bun not running"
+# Kill Godot (if building Godot)
+taskkill //F //IM godot.windows.editor.x86_64.exe 2>&1 || echo "Godot not running"
 ```
 
 Note: OpenCode's process may appear as `bun.exe` instead of `opencode.exe`.
 
-### Step 1: Build OpenCode
+### Step 1: Build OpenCode (if needed)
 
 ```bash
 cd /g/blured-engine/opencode/packages/opencode && bun run build --single
@@ -33,7 +51,7 @@ cd /g/blured-engine/opencode/packages/opencode && bun run build --single
 
 This creates the executable at: `opencode/packages/opencode/dist/opencode-windows-x64/bin/opencode.exe`
 
-### Step 2: Build Godot Engine
+### Step 2: Build Godot Engine (if needed)
 
 ```bash
 cd /g/blured-engine/godot && python -m SCons platform=windows target=editor d3d12=no -j8
@@ -47,7 +65,7 @@ Note: This step may fail if:
 
 ### Step 3: Confirm to User
 
-Tell the user:
+Tell the user what was built (and what was skipped if applicable):
 - OpenCode build: `opencode/packages/opencode/dist/opencode-windows-x64/bin/opencode.exe`
 - Godot build: `godot/bin/godot.windows.editor.x86_64.exe`
 - Run `/start-blured` to launch the engine
