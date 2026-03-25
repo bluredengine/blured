@@ -1,4 +1,4 @@
-# Makabaka Engine - Game Development Rules
+# Blured Engine - Game Development Rules
 
 ## Visual Design Phase (TC-EBC)
 

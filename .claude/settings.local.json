@@ -7,7 +7,9 @@
       "Bash(bash script/clean-dist.sh)",
       "Bash(bun run:*)",
       "Bash(python -m SCons platform=windows target=editor d3d12=no -j8)",
-      "Bash(git submodule:*)"
+      "Bash(git submodule:*)",
+      "Bash(curl -s \"http://localhost:13700/session\")",
+      "Bash(python -c \":*)"
     ]
   }
 }

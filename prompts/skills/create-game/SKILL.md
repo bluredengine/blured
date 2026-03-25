@@ -86,7 +86,7 @@ Call the `question` tool with:
   - { label: "Style template", description: "Pick from proven templates: pixel art, hand-drawn, vector, atmospheric" }
   - { label: "Unique identity", description: "Full worldbuilding + art direction from scratch" }
 
-- **Match reference** → Describe the reference game's visual style (palette, shape language, density, mood). Call `godot_style_set` with those parameters. Then call `godot_art_explore` to generate 4 style explorations matching this description. Let user confirm which one captures the reference feel best. Call `godot_art_confirm` → write `docs/visual_bible.md` → update `godot_style_set` with the chosen image as reference. Call `godot_creation_progress` with phase="art_direction", status="completed"
+- **Match reference** → Describe the reference game's visual style (palette, shape language, density, mood). Call `godot_art_explore` to generate 4 style explorations matching this description. Let user confirm which one captures the reference feel best. Call `godot_art_confirm` → write `docs/visual_bible.md` → call `godot_style_set` with the chosen image as reference and the extracted art direction. Call `godot_creation_progress` with phase="art_direction", status="completed"
 - **Style template** → Go to [Visual Templates](#visual-templates)
 - **Unique identity** → Go to [Full Visual Creation](#full-visual-creation)
 
@@ -242,12 +242,11 @@ Based on the user's description, the AI autonomously:
 **Visual Design (auto-generated, ONE confirmation):**
 1. Choose a visual style that fits the game type and mood
 2. Define color palette (3-4 dominant colors), shape language, visual density
-3. Call `godot_style_set` with the chosen parameters
-4. Call `godot_art_explore` to generate 4 Key Art style explorations — the user SEES the style before it's locked
-5. Tell the user to check the **Art Director** panel to view the generated Key Art. Call the `question` tool: "Which style direction fits best?"
-6. Call `godot_art_confirm` with the chosen image → extract visual rules → write `docs/visual_bible.md`
-7. Update `godot_style_set` with reference_asset = chosen image
-8. Call `godot_creation_progress` with phase="art_direction", status="completed"
+3. Call `godot_art_explore` to generate 4 Key Art style explorations — the user SEES the style before it's locked
+4. Tell the user to check the **Art Director** panel to view the generated Key Art. Call the `question` tool: "Which style direction fits best?"
+5. Call `godot_art_confirm` with the chosen image → extract visual rules → write `docs/visual_bible.md`
+6. Call `godot_style_set` with reference_asset = chosen image and the extracted art direction
+7. Call `godot_creation_progress` with phase="art_direction", status="completed"
 
 **Scaffolding (auto-generated):**
 1. Generate full project structure with GDScript
@@ -275,13 +274,12 @@ The user can also type a custom style or name a reference game.
 
 After selection:
 1. Set up a style profile (palette, shape language, density)
-2. Call `godot_style_set` with the template parameters
-3. Call `godot_art_explore` with the game description + gameplay mechanics + 4 style variants based on the chosen template — this generates Key Art concept images (no UI) so the user can SEE the style before committing
-4. Tell the user to check the **Art Director** panel to view the generated Key Art. Call the `question` tool: "Which style direction feels right?"
-5. Call `godot_art_confirm` with the chosen image path — this analyzes the image and extracts color palette, line style, lighting rules
-6. Write `docs/visual_bible.md` with the extracted visual rules
-7. Update `godot_style_set` with the confirmed parameters (reference_asset = chosen exploration image)
-8. Call `godot_creation_progress` with phase="art_direction", status="completed"
+2. Call `godot_art_explore` with the game description + gameplay mechanics + 4 style variants based on the chosen template — this generates Key Art concept images (no UI) so the user can SEE the style before committing
+3. Tell the user to check the **Art Director** panel to view the generated Key Art. Call the `question` tool: "Which style direction feels right?"
+4. Call `godot_art_confirm` with the chosen image path — this analyzes the image and extracts color palette, line style, lighting rules
+5. Write `docs/visual_bible.md` with the extracted visual rules
+6. Call `godot_style_set` with the confirmed parameters (reference_asset = chosen exploration image)
+7. Call `godot_creation_progress` with phase="art_direction", status="completed"
 
 **IMPORTANT**: NEVER skip art exploration. The user MUST see generated Key Art images before the style is locked. Text descriptions alone are not sufficient — people need to SEE the style. Always direct users to the **Art Director** panel to view explorations (NOT the FileSystem dock).
 

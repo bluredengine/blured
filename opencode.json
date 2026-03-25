@@ -1,0 +1,6 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "services": {
+    "vision_model": "volcengine/doubao-seed-1-6-vision-250815"
+  }
+}
