@@ -70,19 +70,24 @@ If you don't want to set up RMBG locally, you can configure an **online provider
 
 ## Configuration
 
-### LLM Provider
+All providers are configured through the **Setup Wizard** in the AI Assistant panel.
 
-Set your LLM API key in the project `.env` file or via the Setup Wizard in the AI Assistant panel.
-
-### AI Asset Providers
-
-Configure API keys for asset generation providers in the AI Assistant Setup Wizard:
+### Recommended Provider Setup
 
 | Provider | Purpose | Auth |
 |----------|---------|------|
-| **Replicate** | Textures, sprites, backgrounds | OAuth or API token |
+| **Anthropic** | Chat / coding assistant (Claude) | OAuth token |
+| **Replicate** | Image generation, background removal | API token |
+
+Anthropic supports OAuth login -- no API key needed. Replicate handles both image generation and background removal, since no existing AI model generates good transparent images directly.
+
+### Additional Providers (Optional)
+
+| Provider | Purpose | Auth |
+|----------|---------|------|
 | **Meshy** | 3D models with PBR textures | API key |
 | **Suno** | Music, SFX, voice | API key |
+| **Google** | Chat (Gemini) | API key |
 
 ### Background Removal
 
@@ -119,8 +124,13 @@ cd godot
 python -m SCons platform=windows target=editor d3d12=no -j8
 cd ..
 
+# Build OpenCode
+cd opencode/packages/opencode
+bun run build --single
+cd ../../..
+
 # Start the engine
-./start_Blured.bat
+godot/bin/godot.windows.editor.x86_64.exe
 ```
 
 ## Project Structure
@@ -134,7 +144,7 @@ blured-engine/
       services/rmbg/        # RMBG-2.0 background removal service
       src/server/           # HTTP server & routes
       src/tool/             # AI tools (asset pipeline, postprocess, etc.)
-  launcher/                 # Rust launcher with auto-update
+  launcher/                 # Rust launcher
   docs/                     # Documentation
 ```
 
