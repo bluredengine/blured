@@ -1,0 +1,261 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g., 0.2.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  SCONS_CACHE: ${{ github.workspace }}/.scons_cache/
+
+jobs:
+  build-opencode:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Configure git for Windows
+        run: |
+          git config --system core.longpaths true
+          git config --system core.symlinks false
+        shell: pwsh
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: opencode/package.json
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ hashFiles('opencode/bun.lock') }}
+          restore-keys: bun-
+
+      - name: Install dependencies
+        run: cd opencode && bun install
+
+      - name: Typecheck
+        run: cd opencode && bun turbo typecheck
+
+      - name: Test
+        run: cd opencode/packages/opencode && bun test
+        continue-on-error: true
+
+      - name: Build
+        run: cd opencode/packages/opencode && bun run build --single
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opencode-build
+          path: opencode/packages/opencode/dist/opencode-windows-x64/
+          retention-days: 3
+
+  build-godot:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout godot submodule only
+        run: git submodule update --init godot
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install SCons
+        run: pip install scons==4.10.1
+
+      - name: Restore SCons cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.SCONS_CACHE }}
+          key: godot-editor|${{ github.ref_name }}|${{ github.sha }}
+          restore-keys: |
+            godot-editor|main
+
+      - name: Store cache timestamp
+        shell: bash
+        run: echo "CACHE_TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Build Godot editor
+        shell: bash
+        run: |
+          cd godot
+          scons platform=windows target=editor d3d12=no \
+            debug_symbols=no \
+            "cache_path=$SCONS_CACHE" \
+            -j$NUMBER_OF_PROCESSORS
+
+      - name: Run Godot tests
+        shell: bash
+        run: godot/bin/godot.windows.editor.x86_64.exe --test --force-colors
+        continue-on-error: true
+
+      - name: Purge old cache files
+        shell: bash
+        run: |
+          python godot/misc/scripts/purge_cache.py $CACHE_TIMESTAMP "$SCONS_CACHE"
+
+      - name: Save SCons cache
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.SCONS_CACHE }}
+          key: godot-editor|main|${{ github.sha }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: godot-build
+          path: |
+            godot/bin/godot.windows.editor.x86_64.exe
+            godot/bin/tools/
+          retention-days: 3
+
+  build-launcher:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: launcher
+
+      - name: Build launcher
+        run: cd launcher && cargo build --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: launcher-build
+          path: launcher/target/release/blured-launcher.exe
+          retention-days: 3
+
+  package:
+    needs: [build-opencode, build-godot, build-launcher]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: opencode-build
+          path: artifacts/opencode
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: godot-build
+          path: artifacts/godot
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: launcher-build
+          path: artifacts/launcher
+
+      - name: Assemble package
+        shell: bash
+        run: |
+          DIST="dist/blured-engine"
+          mkdir -p "$DIST/bin" "$DIST/tools" "$DIST/docs"
+
+          # Launcher
+          cp artifacts/launcher/blured-launcher.exe "$DIST/blured.exe"
+
+          # Godot editor
+          cp artifacts/godot/godot.windows.editor.x86_64.exe "$DIST/bin/blured.exe"
+
+          # OpenCode server
+          cp artifacts/opencode/bin/opencode.exe "$DIST/bin/opencode.exe"
+
+          # Tools (ScreenCapture)
+          cp -r artifacts/godot/tools/* "$DIST/tools/" 2>/dev/null || true
+
+          # Config files
+          [ -f blured.json ] && cp blured.json "$DIST/"
+          [ -f blured-models.json ] && cp blured-models.json "$DIST/"
+          [ -f .env.example ] && cp .env.example "$DIST/"
+          [ -f LICENSE ] && cp LICENSE "$DIST/"
+
+          # Prompts
+          [ -d prompts ] && cp -r prompts "$DIST/prompts"
+
+          # Docs
+          [ -d docs ] && cp -r docs/* "$DIST/docs/" 2>/dev/null || true
+
+          # Version from tag or input
+          if [[ "$GITHUB_REF_NAME" == v* ]]; then
+            echo "${GITHUB_REF_NAME#v}" > "$DIST/VERSION"
+          elif [[ -n "${{ inputs.version }}" ]]; then
+            echo "${{ inputs.version }}" > "$DIST/VERSION"
+          else
+            echo "0.0.0-dev" > "$DIST/VERSION"
+          fi
+
+          echo "Package contents:"
+          find "$DIST" -type f
+
+      - name: Create zip
+        shell: bash
+        run: cd dist && 7z a -tzip blured-engine-windows-x64.zip blured-engine/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-package
+          path: dist/blured-engine-windows-x64.zip
+          retention-days: 3
+
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-package
+          path: dist/
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF_NAME" == v* ]]; then
+            echo "tag=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+            echo "name=Blured Engine $GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+          else
+            echo "tag=v${{ inputs.version }}" >> $GITHUB_OUTPUT
+            echo "name=Blured Engine v${{ inputs.version }}" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.name }}
+          draft: true
+          files: dist/blured-engine-windows-x64.zip
+          body: |
+            ## ${{ steps.version.outputs.name }}
+
+            ### Installation
+            1. Download and extract `blured-engine-windows-x64.zip`
+            2. Copy `.env.example` to `.env` and configure your project path
+            3. Run `blured.exe`
+
+            ### What's included
+            - Blured Editor (Godot-based game engine)
+            - OpenCode AI server (built-in AI assistant)
+            - Launcher with auto-update support
