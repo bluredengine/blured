@@ -114,24 +114,14 @@ If neither is available, background removal is skipped without breaking the pipe
 git clone --recursive https://github.com/bluredengine/blured.git
 cd blured
 
-# Install OpenCode dependencies
-cd opencode
-bun install
-cd ..
-
-# Build Godot
-cd godot
-python -m SCons platform=windows target=editor d3d12=no -j8
-cd ..
-
-# Build OpenCode
-cd opencode/packages/opencode
-bun run build --single
-cd ../../..
+# Build (OpenCode + Godot)
+/build-blured
 
 # Start the engine
-godot/bin/godot.windows.editor.x86_64.exe
+/start-blured
 ```
+
+These are [Claude Code](https://claude.com/claude-code) slash commands defined in `.claude/skills/`. They handle dependency detection, incremental builds, and launching both the AI server and editor.
 
 ## Project Structure
 
