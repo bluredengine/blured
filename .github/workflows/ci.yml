@@ -1,0 +1,174 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SCONS_CACHE: ${{ github.workspace }}/.scons_cache/
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      opencode: ${{ steps.result.outputs.opencode }}
+      godot: ${{ steps.result.outputs.godot }}
+      launcher: ${{ steps.result.outputs.launcher }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            opencode:
+              - 'opencode/**'
+            godot:
+              - 'godot/**'
+            launcher:
+              - 'launcher/**'
+            ci:
+              - '.github/**'
+      - id: result
+        shell: bash
+        run: |
+          dispatch="${{ github.event_name == 'workflow_dispatch' }}"
+          ci="${{ steps.filter.outputs.ci }}"
+          echo "opencode=${{ steps.filter.outputs.opencode == 'true' || env.force == 'true' }}" >> $GITHUB_OUTPUT
+          echo "godot=${{ steps.filter.outputs.godot == 'true' || env.force == 'true' }}" >> $GITHUB_OUTPUT
+          echo "launcher=${{ steps.filter.outputs.launcher == 'true' || env.force == 'true' }}" >> $GITHUB_OUTPUT
+        env:
+          force: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.ci == 'true' }}
+
+  build-opencode:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.opencode == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: opencode/package.json
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ hashFiles('opencode/bun.lock') }}
+          restore-keys: bun-
+
+      - name: Install dependencies
+        run: cd opencode && bun install
+
+      - name: Typecheck
+        run: cd opencode && bun turbo typecheck
+
+      - name: Test
+        run: cd opencode && bun turbo test
+
+      - name: Build
+        run: cd opencode/packages/opencode && bun run build --single
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opencode-build
+          path: opencode/packages/opencode/dist/opencode-windows-x64/
+          retention-days: 7
+
+  build-godot:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.godot == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install SCons
+        run: pip install scons==4.10.1
+
+      - name: Restore SCons cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.SCONS_CACHE }}
+          key: godot-editor|${{ github.ref_name }}|${{ github.sha }}
+          restore-keys: |
+            godot-editor|${{ github.ref_name }}
+            godot-editor|main
+
+      - name: Store cache timestamp
+        shell: bash
+        run: echo "CACHE_TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Build Godot editor
+        shell: bash
+        run: |
+          cd godot
+          scons platform=windows target=editor d3d12=no \
+            debug_symbols=no \
+            "cache_path=$SCONS_CACHE" \
+            -j$NUMBER_OF_PROCESSORS
+
+      - name: Run Godot tests
+        shell: bash
+        run: godot/bin/godot.windows.editor.x86_64.exe --test --force-colors
+        continue-on-error: true
+
+      - name: Purge old cache files
+        shell: bash
+        run: |
+          python godot/misc/scripts/purge_cache.py $CACHE_TIMESTAMP "$SCONS_CACHE"
+
+      - name: Save SCons cache
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.SCONS_CACHE }}
+          key: godot-editor|${{ github.ref_name }}|${{ github.sha }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: godot-build
+          path: |
+            godot/bin/godot.windows.editor.x86_64.exe
+            godot/bin/tools/
+          retention-days: 7
+
+  build-launcher:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.launcher == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: launcher
+
+      - name: Build launcher
+        run: cd launcher && cargo build --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: launcher-build
+          path: launcher/target/release/blured-launcher.exe
+          retention-days: 7
