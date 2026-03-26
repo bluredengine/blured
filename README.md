@@ -2,6 +2,27 @@
 
 An AI-powered game engine built on [Godot 4.x](https://godotengine.org/) and [OpenCode](https://github.com/opencode-ai/opencode). Create games using natural language — from asset generation to gameplay scripting.
 
+## Why Blured Engine?
+
+Making a game today requires programming, art, UI design, animation, and fluency with complex editor tools. Most people have great game ideas but lack one or more of these skills, so their ideas never become reality.
+
+Blured Engine aims to change that. By embedding AI directly into every part of the game development workflow, we want to make it possible for **anyone** to create indie games — whether you can code or not, whether you can draw or not, whether you've ever used a game editor or not. Just describe what you want, and the engine helps you build it.
+
+## AI Agents
+
+Blured Engine uses specialized AI agents that understand different aspects of game development:
+
+| Agent | Status | Description |
+|-------|--------|-------------|
+| **Game Dev Agent** | Available | Writes and modifies gameplay scripts, fixes bugs, answers questions about your project |
+| **QA Agent** | Available | Captures screenshots, analyzes game visuals, diagnoses runtime errors automatically |
+| **UI Agent** | Available | Designs and builds user interfaces from natural language descriptions |
+| **Animation Agent** | Planned | Will create and edit animations from descriptions |
+| **Level Design Agent** | Planned | Will build and arrange game scenes and environments |
+| **3D Agent** | Planned | Will generate and refine 3D models, materials, and lighting |
+
+All agents work inside the editor through the **AI Assistant** panel — no external tools or command lines needed.
+
 ## Architecture
 
 ```
@@ -20,7 +41,7 @@ Godot Editor (C++) <--HTTP--> OpenCode AI Server (Bun/TypeScript) <--> Cloud AI 
 
 ## Features
 
-- **AI Assistant** — Chat interface embedded in the Godot editor with multi-instance support, streaming responses, and tool execution
+- **AI Assistant** — Chat interface embedded in the editor with multi-instance support, streaming responses, and tool execution
 - **AI Asset Generation** — Generate textures, sprites, 3D models, audio, and more via cloud AI (Replicate, Meshy, Suno)
 - **Art Director** — Visual style exploration, style locking, and batch asset production with style consistency
 - **Background Removal** — Automatic background removal in the asset pipeline (see [configuration](#background-removal))
