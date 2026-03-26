@@ -23,6 +23,18 @@ Blured Engine uses specialized AI agents that understand different aspects of ga
 
 All agents work inside the editor through the **AI Assistant** panel — no external tools or command lines needed.
 
+### UI Agent Workflow
+
+Once you have a whitebox prototype in place, tell the AI Assistant to "create production UI". The UI Agent follows a multi-step pipeline:
+
+1. **Art style definition** — Establishes the visual style (colors, typography, theme) based on your game's Art Director settings or your description
+2. **Cornerstone assets** — Generates a reference image containing the foundational UI elements (buttons, panels, frames, icons) that define the look and feel
+3. **Layout image** — Generates a layout image that arranges UI components into screen layouts matching your whitebox structure
+4. **Test scene** — Builds a standalone UI test scene so you can preview and iterate before touching the real game
+5. **Integration** — Applies the finalized UI into your actual game scenes
+
+> **Tip:** Make sure your whitebox viewport resolution is large enough before running the UI Agent. We recommend **1920x1080** for best results.
+
 ## Architecture
 
 ```
