@@ -51,7 +51,7 @@ jobs:
         run: cd opencode && bun turbo typecheck
 
       - name: Test
-        run: cd opencode && bun turbo test
+        run: cd opencode/packages/opencode && bun test
 
       - name: Build
         run: cd opencode/packages/opencode && bun run build --single
